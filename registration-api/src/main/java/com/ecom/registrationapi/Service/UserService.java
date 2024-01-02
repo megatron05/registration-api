@@ -34,9 +34,14 @@ public class UserService {
         }
 
     }
-    public ResponseEntity<User> registerUser(User newUser){
-        userDao.save(newUser);
-        return new ResponseEntity<>(newUser, HttpStatus.OK);
+    public ResponseEntity<?> registerUser(User newUser){
+        if (userDao.findByEmail(newUser.getEmail()).isEmpty()) {
+            userDao.saveAndFlush(newUser);
+            return new ResponseEntity<>(newUser, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>("This Email already exists", HttpStatus.BAD_REQUEST);
+       }
     }
 
     public ResponseEntity<User> editUser(String firstName, String lastName, Integer phoneNumber, String email) {
@@ -46,5 +51,21 @@ public class UserService {
         u.setPhoneNumber(phoneNumber);
         userDao.save(u);
         return new ResponseEntity<>(u, HttpStatus.OK);
+    }
+
+    public ResponseEntity<String> changePasswordUser(String email, String oldPassword, String newPassword) {
+        if (userDao.findByEmail(email).isEmpty()){
+            return new ResponseEntity<String>("The Email Id cannot be found", HttpStatus.NOT_FOUND);
+        }
+        else {
+            User u = userDao.findByEmail(email).get();
+            if (u.getPassword().equals(oldPassword)) {
+                u.setPassword(newPassword);
+                userDao.save(u);
+                return new ResponseEntity<>("Password updated", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Wrong Password", HttpStatus.BAD_REQUEST);
+            }
+        }
     }
 }

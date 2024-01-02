@@ -15,7 +15,7 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> userRegistration(@RequestBody User newUser){
+    public ResponseEntity<?> userRegistration(@RequestBody User newUser){
         return userService.registerUser(newUser);
     }
 
@@ -32,5 +32,10 @@ public class UserController {
     @PostMapping("/editProfile")
     public ResponseEntity<User> editUser(@RequestHeader String firstName, @RequestHeader String lastName, @RequestHeader Integer phoneNumber, @RequestHeader String email){
         return userService.editUser(firstName, lastName, phoneNumber, email);
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<String> changePassword(@RequestHeader String email, @RequestHeader String oldPassword,@RequestHeader String newPassword){
+        return userService.changePasswordUser(email, oldPassword, newPassword);
     }
 }
